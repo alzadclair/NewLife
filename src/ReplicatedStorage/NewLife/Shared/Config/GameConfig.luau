@@ -1,0 +1,213 @@
+--!strict
+local GameConfig = {
+    Version = "1.4.0-economy",
+    SchemaVersion = 13,
+    DataStoreName = "NewLife_PlayerData_v1",
+    AutosaveSeconds = 60,
+    Pillars = { "SKILL", "FATE", "CHOICE", "LEGACY" },
+    Progression = {
+        MaxLevel = 1000,
+        DeathLevelLoss = 2,
+        BaseXPToNext = 100,
+        XPPerLevel = 25,
+        NoMagicChance = 0.20,
+        RacialSkillCooldown = 12,
+        NoMagicPhysicalBonus = 1.25,
+        MasteryBaseGain = 10,
+        DefierThreshold = 3,
+        DefierAptitudeThreshold = 60,
+        RaceMasteryThresholds = { 20, 50, 100, 150, 300 },
+        ClassMasteryThresholds = { 20, 50, 100, 150 },
+        HybridStatScalePrimary = 0.60,
+        HybridStatScaleSecondary = 0.40,
+        HybridSecondaryPassiveScale = 0.50,
+        HybridSecondaryActiveUnlockMastery = 40,
+        HybridStaminaPenalty = 5,
+    },
+    World = {
+        -- Production follows the server runtime's real local clock. In Studio only,
+        -- 720x makes one real 120-second interval represent a complete 24-hour day.
+        StudioDebugTimeScale = 720,
+        GuidingWindRange = 150,
+        GuidingWindDuration = 3,
+        GuidingWindStrength = 32,
+        GuidingWindInputKey = 'V',
+    },
+    Party = {
+        MaxSize = 5,
+        InviteSeconds = 30,
+        IndividualLoot = true,
+    },
+    Chat = {
+        MaxLength = 180,
+        LocalRange = 120,
+        RateLimitSeconds = 0.75,
+        ReportReasonMaxLength = 120,
+    },
+    Guilds = {
+        MaxMembers = 50,
+        InviteSeconds = 60,
+        MinNameLength = 3,
+        MaxNameLength = 24,
+        MaxTagLength = 5,
+        GuildRankXPPerStep = 100,
+        EnemyKillXP = 10,
+        RankSequence = {
+            'F', 'E', 'C', 'B', 'A', 'S', 'SS', 'SSS',
+            '1-I', '1-II', '1-III', '1-IV', '1-V',
+            '2-I', '2-II', '2-III', '2-IV', '2-V',
+            '3-I', '3-II', '3-III', '3-IV', '3-V',
+            '4-I', '4-II', '4-III', '4-IV', '4-V',
+            '5-I', '5-II', '5-III', '5-IV', '5-V',
+        },
+        Roles = {
+            Owner = {Invite=true, Kick=true, SetRole=true, ManageGuild=true, ShareQuest=true},
+            Officer = {Invite=true, Kick=true, SetRole=false, ManageGuild=false, ShareQuest=true},
+            Member = {Invite=false, Kick=false, SetRole=false, ManageGuild=false, ShareQuest=true},
+            Recruit = {Invite=false, Kick=false, SetRole=false, ManageGuild=false, ShareQuest=false},
+        },
+    },
+    Social = {
+        MaxBlocked = 100,
+        MaxMuted = 100,
+        MaxReports = 50,
+        DefaultNation = 'VerdantReign',
+    },
+    Kingdoms = {
+        OrderedIds = {'VerdantReign','IronHold','Sunspire','ShadowKeep','FrostPeak'},
+        DefaultKingdom = 'VerdantReign',
+        ReputationMin = -1000,
+        ReputationMax = 1000,
+    },
+    Rankings = {
+        Categories = {'Power','Guild','PvP','BossKills','Assassin','Exploration','Wealth','Arena'},
+        RulerStartRank = 2,
+        RulerEndRank = 6,
+    },
+    WorldPower = {
+        DataStoreName = 'NewLife_WorldState_v1',
+        InvestDefenseCost = 100,
+        InvestDefenseGain = 1,
+        MaxDefenseLevel = 100,
+        MajorInvestmentThreshold = 100,
+    },
+    Network = {
+        MaxTargetDistance = 14,
+        LockOnDistance = 60,
+        InteractDistance = 14,
+        RateLimits = {
+            LightAttack = 0.32,
+            HeavyAttack = 0.90,
+            Dodge = 0.72,
+            Dash = 1.05,
+            Block = 0.08,
+            Parry = 0.75,
+            Sprint = 0.08,
+            Interact = 0.30,
+            RacialSkill = 0.50,
+            UseSkill = 0.08,
+            CastMagic = 0.08,
+            EquipSkill = 0.08,
+            GuidingWind = 0.75,
+            PartyCreate = 0.75,
+            PartyInvite = 0.30,
+            PartyRespond = 0.30,
+            PartyLeave = 0.50,
+            PartyTransferLeader = 0.30,
+            PartyKick = 0.30,
+            PartyShareQuest = 0.75,
+            SendChat = 0.20,
+            GuildCreate = 1.00,
+            GuildInvite = 0.40,
+            GuildRespond = 0.40,
+            GuildLeave = 0.75,
+            GuildKick = 0.40,
+            GuildSetRole = 0.40,
+            GuildTransferOwner = 0.75,
+            SocialInspect = 0.30,
+            SocialBlock = 0.30,
+            SocialMute = 0.30,
+            SocialReport = 1.00,
+            InvestDefense = 1.00,
+            DungeonInteract = 0.35,
+            RareUseItem = 0.35,
+            RareEquipRelic = 0.20,
+            RareUnequipRelic = 0.20,
+            RareOpenWorldClaim = 0.75,
+            VendorBuy = 0.20,
+            VendorSell = 0.20,
+            TradeInvite = 0.40,
+            TradeRespond = 0.30,
+            TradeOfferItem = 0.12,
+            TradeOfferGold = 0.12,
+            TradeOfferRare = 0.12,
+            TradeConfirm = 0.25,
+            TradeCancel = 0.20,
+            MarketList = 0.35,
+            MarketCancel = 0.25,
+            MarketPurchase = 0.30,
+            MarketBrowse = 0.40,
+        },
+    },
+    Combat = {
+        BaseDamage = 8,
+        StrengthScale = 0.75,
+        PowerScale = 0.45,
+        DefenseScale = 0.55,
+        MinimumDamage = 1,
+        AttackStateSeconds = 0.22,
+        HeavyBaseDamage = 18,
+        HeavyStrengthScale = 1.10,
+        HeavyPowerScale = 0.70,
+        HeavyStateSeconds = 0.52,
+        BlockDamageMultiplier = 0.35,
+        BlockStaminaCost = 14,
+        ParryWindow = 0.22,
+        ParryStunSeconds = 0.70,
+        ParryStaminaCost = 12,
+        DodgeDuration = 0.28,
+        DodgeStaminaCost = 18,
+        DodgeSpeed = 44,
+        DashDuration = 0.22,
+        DashStaminaCost = 24,
+        DashSpeed = 64,
+        KnockbackLight = 18,
+        KnockbackHeavy = 35,
+        RespawnSeconds = 3,
+        EnemyAttackCooldown = 1.20,
+        EnemyAttackRange = 5.5,
+        EnemyDetectRange = 50,
+        EnemyMoveSpeed = 8,
+        EnemyDamage = 10,
+    },
+    Character = {
+        WalkSpeed = 16,
+        SprintWalkSpeed = 24,
+        ManaRegenPerSecond = 5,
+        StaminaRegenPerSecond = 10,
+        SprintStaminaPerSecond = 12,
+        ResourceTickSeconds = 0.20,
+    },
+}
+
+table.freeze(GameConfig.Progression)
+table.freeze(GameConfig.World)
+table.freeze(GameConfig.Party)
+table.freeze(GameConfig.Chat)
+table.freeze(GameConfig.Guilds.RankSequence)
+for _, role in pairs(GameConfig.Guilds.Roles) do table.freeze(role) end
+table.freeze(GameConfig.Guilds.Roles)
+table.freeze(GameConfig.Guilds)
+table.freeze(GameConfig.Social)
+table.freeze(GameConfig.Kingdoms.OrderedIds)
+table.freeze(GameConfig.Kingdoms)
+table.freeze(GameConfig.Rankings.Categories)
+table.freeze(GameConfig.Rankings)
+table.freeze(GameConfig.WorldPower)
+table.freeze(GameConfig.Network.RateLimits)
+table.freeze(GameConfig.Network)
+table.freeze(GameConfig.Combat)
+table.freeze(GameConfig.Character)
+table.freeze(GameConfig.Pillars)
+table.freeze(GameConfig)
+return GameConfig

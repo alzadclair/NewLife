@@ -1230,3 +1230,139 @@ Studio encerrado em **Edit**.
 ## NEXT PHASE
 
 **FASE 13 — ECONOMY, TRADING, MARKETS & ITEM PROVENANCE**
+
+---
+
+# FASE 13 — ECONOMY, TRADING, MARKETS & ITEM PROVENANCE INTEGRATION
+
+Data: 2026-09-29
+
+## Implementação
+
+A Fase 13 foi construída sobre os sistemas existentes. Gold continua em `Progression.Gold`, Inventory continua sendo o inventário canônico do perfil, RareContent/TransferItem continua sendo a base de provenance rara e a tesouraria de kingdom continua em RulerService.
+
+### Economy / Currency / Ledger
+
+- `EconomyConfig` centraliza limites e taxas server-owned.
+- `EconomyService.IsValidAmount` exige inteiro positivo, finito e dentro de `MaxGold`.
+- `ApplyDelta` rejeita saldo inválido, insufficient funds e overflow sem mutação parcial.
+- `Earn`/`Spend` usam transaction id e replay guard persistível.
+- Ledger grava TransactionId, Type, Timestamp, Source, Destination, Amount, Fee, Status e metadata opcional; cap atual = 80.
+- ProcessedTransactions possui cap de 120.
+
+### Vendors
+
+Merchant Boran reutiliza `ContentDefinitions.NPCs.MerchantBoran.Inventory`. Buy/sell são decididos no servidor. O preço usa o preço base do NPC e um modificador simples por MerchantBoran Reputation, com clamp configurado.
+
+### Trade
+
+Fluxo implementado: Invite → Respond → Session → Offer Gold/Item/Rare → Confirm → Commit/Cancel.
+
+- self-trade rejeitado;
+- mudanças de oferta resetam confirmações;
+- rare item possui lock por `UniqueItemId`;
+- cancel/timeout/disconnect libera lock;
+- ownership, balance e inventory são revalidados no commit;
+- rare transfer reutiliza `RareContentService:TransferItem` com transaction context.
+
+Limitação atual: o commit possui rollback completo para validações antes da mutação, mas a proteção final contra falha tardia em uma sequência multi-rare ainda depende do TransferItem não falhar após o precheck. Isso precisa de um teste concorrente/runtime antes do PASS final.
+
+### Marketplace
+
+Implementados list/cancel/browse/purchase para seller online.
+
+- listing fields: ListingId, SellerUserId, ItemId/UniqueItemId, Quantity, Price, CreatedAt, ExpiresAt, Status;
+- item normal é removido para escrow lógico no list e devolvido no cancel;
+- rare item fica reservado por lock compartilhado;
+- purchase rejeita listing inválida/expirada/self-purchase/seller offline/insufficient funds;
+- settlement calcula sale fee + kingdom tax + seller net;
+- kingdom tax chama `RulerService:CreditTreasury`;
+- price history guarda LastSale, RecentAverage, Volume, Min e Max.
+
+Offline seller payout/receivable ficou preparado no Schema 13 (`Economy.Receivables`) mas não foi fechado nesta execução; o fluxo online é o implementado.
+
+### Provenance
+
+`RareContentService:TransferItem` foi estendido sem substituir o serviço existente. Mantém `FirstOwnerUserId`, atualiza `CurrentOwnerUserId`, `TransferSource`, `TransactionId`, `TransferTimestamp` e `OwnershipHistory`. Relic atualmente equipada é rejeitada antes da transferência.
+
+### Save
+
+Schema 13 adiciona:
+
+`Economy = { Ledger, ProcessedTransactions, Receivables, Market }`
+
+A migração é aditiva; Schema 12 e campos anteriores são preservados. Trade session, invite e locks continuam somente em memória.
+
+### Networking / Security
+
+Novas actions: VendorBuy, VendorSell, TradeInvite, TradeRespond, TradeOfferItem, TradeOfferGold, TradeOfferRare, TradeConfirm, TradeCancel, MarketList, MarketCancel, MarketPurchase, MarketBrowse.
+
+O cliente nunca informa balance final, preço final, fee, tax, ownership final ou provenance final. Quantidades e ids recebidos são tratados como intenção e revalidados no serviço.
+
+## T-1300+
+
+`Phase13Economy_Test` foi criado e executado isoladamente no Server runtime.
+
+Resultado: **26 PASS / 0 FAIL**.
+
+- T-1300 Schema 13.
+- T-1301 positive integer amount.
+- T-1302 zero rejection.
+- T-1303 negative rejection.
+- T-1304 fractional rejection.
+- T-1305 NaN rejection.
+- T-1306 earn delta.
+- T-1307 insufficient funds atomic rejection.
+- T-1308 exact spend.
+- T-1309 overflow rejection.
+- T-1310 invalid starting balance.
+- T-1311 default item policy.
+- T-1312 SlimeGel policy.
+- T-1313 settlement conservation.
+- T-1314 integer/nonnegative fee and tax.
+- T-1315 listing fee config.
+- T-1316 kingdom tax config.
+- T-1317 ledger compaction.
+- T-1318 vendor network actions.
+- T-1319 trade network actions.
+- T-1320 market network actions.
+- T-1321 economy rate limits.
+- T-1322 trade timeout.
+- T-1323 listing expiry.
+- T-1324 compact price-history cap.
+- T-1325 canonical Phase 13 services present.
+
+## Runtime / Console
+
+Play iniciou corretamente com:
+
+`[NewLife] FASE 13 economy, trading and markets online`
+
+Nenhum erro Luau dos novos módulos apareceu no console. Os eventos observados fora da implementação foram:
+
+- erro de chamada do harness legado: `attempt to call a table value`, causado por `RunUnitTest` retornar uma tabela com `.Run`;
+- `robloxstudio-mcp /ready ... ConnectFail`, aviso externo do proxy da ferramenta.
+
+A suíte Phase13 foi então executada diretamente com o contrato `t.test`, terminando 26/26 PASS.
+
+## Bloqueio de ferramenta / não executado
+
+A revisão automática bloqueou, antes da execução, a chamada de integração que faria earn → VendorBuy → VendorSell → MarketList → self-purchase rejection. Uma edição posterior para centralizar rewards antigos em EconomyService também foi bloqueada antes de aplicar.
+
+Por isso, os seguintes itens permanecem **NOT EXECUTED / PENDENTES** nesta fase:
+
+- runtime vendor/trade/market end-to-end adicional;
+- concurrent simultaneous purchase/double-spend runtime;
+- UI mínima Vendor/Trade/Market;
+- localization das novas strings em pt-BR/en-US/es/ja/zh/ru;
+- centralização de Quest/Enemy/Dungeon/WorldBoss Gold rewards em EconomyService;
+- offline seller payout completo;
+- multiplayer real 2+ clients.
+
+**MULTIPLAYER REAL 2+ CLIENTS = NOT EXECUTED**
+
+Studio confirmado em **Edit** ao final.
+
+## NEXT PHASE
+
+**FASE 14 — PVP, BOUNTIES, GUILD WARS & ANTI-GRIEF**

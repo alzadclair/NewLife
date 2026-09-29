@@ -2,18 +2,20 @@
 
 Data: 2026-09-29
 
-- Fases 0–6 permanecem congeladas com PASS; Fases 7–11 não foram revalidadas nesta tarefa.
-- FASE 12 — LOST CLASSES, LEGENDARY BOOKS & RELICS: **PASS COM RESSALVA** somente por `MULTIPLAYER REAL 2+ CLIENTS = NOT EXECUTED`.
-- Versão atual: `1.3.0-rare-content`; save = Schema 12.
-- 5 Extinct Classes técnicas (`ExtinctClass_01`..`ExtinctClass_05`) foram adicionadas com chaves de localização substituíveis; não existe lore/nome final inventado.
-- Extinct Class Book usa seleção aleatória server-side entre as 5 classes, máximo de uma Extinct Class por personagem, consumo único, Level reset exatamente para 1 e preservação do progresso permanente.
-- Legendary Skill e Legendary Magic possuem exemplos provisórios funcionais integrados aos serviços autoritativos existentes.
-- Oportunidades mensais são server-authoritative, podem ter mês sem oportunidade e possuem claim atômico persistido em produção contra restart/race/reroll.
-- Proveniência e ownership usam `UniqueItemId`, origem, servidor, primeiro/dono atual, histórico compacto, `WorldEventId` e versão; transferência é API server-side preparada.
-- Relics: 9 categorias técnicas × 5 linhagens canônicas = 45 configs, equip/unequip/stats/passivas, sinergia 2p/3p e políticas Normal/Rare/ServerLimited/WorldUnique.
-- `LostArchiveCache` integra conteúdo raro ao Open World em Mossfall Ruins com validação de distância no servidor; DungeonService só tenta recompensa rara através do gate mensal.
-- Localização preparada para pt-BR, en-US, es, ja, zh e ru.
-- T-1200–T-1243 = **44/44 PASS**, 0 failed; integração real confirmou Schema 12 e bloqueio de IDs falsos/claim remoto fora do alcance.
-- MULTIPLAYER REAL 2+ CLIENTS = NOT EXECUTED (`PlayerCount = 1`).
+- Fases 0–12 permanecem como fonte histórica; nesta tarefa foi implementada apenas a Fase 13.
+- FASE 13 — ECONOMY, TRADING, MARKETS & ITEM PROVENANCE: **PASS PARCIAL / BLOQUEIO DE FERRAMENTA**.
+- Versão atual: `1.4.0-economy`; save = Schema 13 aditivo.
+- `EconomyService`, `TradeService` e `MarketService` foram adicionados no servidor e ligados ao Bootstrap/NetworkService.
+- Gold canônico continua em `profile.Progression.Gold`; ledger, replay guard, receivables e market metadata ficam em `profile.Economy`.
+- Merchant Boran possui buy/sell server-side com preço derivado do catálogo e modificador por reputação.
+- Trade possui invite/accept/session/offers/confirm reset/locks/cancel/disconnect e commit server-side; rare items reutilizam `RareContentService:TransferItem`.
+- Marketplace possui list/cancel/browse/purchase online, listing fee, sale fee, kingdom tax, escrow/reservation e histórico agregado de preço.
+- Proveniência rara preserva `FirstOwnerUserId` e agora registra transfer source, transaction id e timestamp; relic equipada não pode ser transferida.
+- `RulerService:CreditTreasury` adiciona imposto econômico à tesouraria canônica existente.
+- Networking expõe somente intenções; preço, saldo, fee, tax, ownership e provenance permanecem server-side.
+- T-1300–T-1325 = **26/26 PASS**, 0 failed.
+- Fluxo runtime adicional de buy/sell/list foi **NOT EXECUTED** porque a revisão automática bloqueou a chamada antes da execução.
+- UI/localization e centralização dos reward paths antigos ficaram pendentes pelo mesmo bloqueio de edição posterior.
+- MULTIPLAYER REAL 2+ CLIENTS = NOT EXECUTED.
 - Studio encerrado em Edit.
-- NEXT PHASE = **FASE 13 — ECONOMY, TRADING, MARKETS & ITEM PROVENANCE**.
+- NEXT PHASE = **FASE 14 — PVP, BOUNTIES, GUILD WARS & ANTI-GRIEF** somente após fechar as pendências da Fase 13.
